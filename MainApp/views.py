@@ -16,14 +16,14 @@ def add_snippet_page(request):
             'pagename': 'Добавление нового сниппета',
             'form': form
         }
-        return render(request, 'pages/add_snippet.html', context)
+        return render(request, 'pages/add_snippet_custom.html', context)
     # Создаем новый Сниппет(данные от формы)
     if request.method == "POST":
         form = SnippetForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect("snippets-list")
-        return render(request, 'pages/add_snippet.html', {'form': form})
+        return render(request, 'pages/add_snippet_custom.html', {'form': form})
 
 
 
