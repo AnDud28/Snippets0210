@@ -22,8 +22,11 @@ def add_snippet_page(request):
     if request.method == "POST":
         form = SnippetForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("snippets-list")
+            snippet = form.save(commit=False)
+            if request.user.is_authenticated:
+                snippet.user = request.user
+                snippet.save()
+                return redirect("snippets-list")
         return render(request, 'pages/add_snippet.html', {'form': form})
 
 
@@ -80,11 +83,8 @@ def snippet_edit(request, snippet_id):
 
 def login(request):
     if request.method == 'POST':
-        print(f'{request.POST = }')
         username = request.POST.get("username")
         password = request.POST.get("password")
-        print("username =", username)
-        print("password =", password)
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
             auth.login(request, user)
