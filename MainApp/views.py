@@ -34,9 +34,18 @@ def add_snippet_page(request):
         return render(request, 'pages/add_snippet.html', {'form': form})
 
 
+@login_required
+def my_snippets(request):
+    snippets = Snippet.objects.filter(user=request.user)
+    context = {
+        'pagename': 'Мои сниппеты',
+        'snippets': snippets
+        }
+    return render(request, 'pages/view_snippets.html', context)
+
 
 def snippets_page(request):
-    snippets = Snippet.objects.all()
+    snippets = Snippet.objects.filter(public=True)
     context = {
         'pagename': 'Просмотр сниппетов',
         'snippets': snippets
@@ -62,6 +71,7 @@ def snippet_delete(request, snippet_id):
     snippet.delete()
     return redirect("snippets-list")
 
+
 def snippet_edit(request, snippet_id):
     try:
         snippet = Snippet.objects.get(id=snippet_id)
@@ -81,6 +91,7 @@ def snippet_edit(request, snippet_id):
         snippet.name = data_form["name"]
         snippet.code = data_form["code"]
         snippet.creation_date = data_form["creation_date"]
+        snippet.public = data_form.get('public', False)
         snippet.save()
         return redirect("snippets-list")
 
@@ -107,5 +118,6 @@ def login(request):
 
 def logout(request):
     auth.logout(request)
+    return redirect('home')
     # реализуем перенаправление на ту страницу, на которой логинился пользователь
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    # return redirect(request.META.get('HTTP_REFERER', '/'))
